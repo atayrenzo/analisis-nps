@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Análisis NPS - Sub Equipo</title>
+<style>
+  :root {
+    --ml-yellow: #FFE600;
+    --ml-blue: #3483FA;
+    --ml-dark: #1a1a2e;
+    --ml-light-blue: #e8f0fe;
+    --ml-gray: #f5f5f5;
+    --ml-border: #d9d9d9;
+    --ml-text: #333;
+    --ml-success: #00a650;
+    --ml-danger: #e22929;
+    --ml-warning: #ff7733;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: var(--ml-text);
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ml-yellow);
+    padding: 14px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ml-dark);
+    letter-spacing: 0.3px;
+  }
+  header span {
+    font-size: 0.85rem;
+    color: #555;
+    font-weight: 500;
+  }
+
+  /* TABS */
+  .tabs-container {
+    background: #fff;
+    padding: 0 20px;
+    border-bottom: 2px solid var(--ml-border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    position: sticky;
+    top: 55px;
+    z-index: 99;
+  }
+  .tab-btn {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #888;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--ml-blue); }
+  .tab-btn.active {
+    color: var(--ml-blue);
+    border-bottom-color: var(--ml-blue);
+  }
+  .add-rep-btn {
+    margin-left: auto;
+    padding: 8px 14px;
+    background: var(--ml-blue);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .add-rep-btn:hover { background: #2968c8; }
+
+  /* MAIN CONTENT */
+  .content {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* PANEL HEADER */
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .panel-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ml-dark);
+  }
+  .btn-new-analysis {
+    background: var(--ml-success);
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .btn-new-analysis:hover { background: #008a42; }
+
+  /* ANALYSIS CARDS LIST */
+  .analysis-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .analysis-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--ml-border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  .card-summary {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .card-summary:hover { background: var(--ml-gray); }
+
+  .card-info {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .badge-caso { background: var(--ml-light-blue); color: var(--ml-blue); }
+  .badge-mes { background: #fff3e0; color: #e65c00; }
+  .badge-nps-pos { background: #e6f9ef; color: var(--ml-success); }
+  .badge-nps-neg { background: #fdeaea; color: var(--ml-danger); }
+  .badge-proceso { background: #f3e8ff; color: #7b2ff7; }
+
+  .card-meta { font-size: 0.82rem; color: #888; }
+
+  .card-actions { display: flex; gap: 8px; }
+  .btn-edit, .btn-delete {
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-edit { background: var(--ml-light-blue); color: var(--ml-blue); }
+  .btn-edit:hover { background: #c3d8fd; }
+  .btn-delete { background: #fdeaea; color: var(--ml-danger); }
+  .btn-delete:hover { background: #f7c5c5; }
+
+  .card-expand { display: none; border-top: 1px solid var(--ml-border); }
+  .card-expand.open { display: block; }
+
+  .card-expand-inner {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 24px;
+  }
+  @media (max-width: 700px) {
+    .card-expand-inner { grid-template-columns: 1fr; }
+  }
+
+  .field-view label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .field-view p {
+    font-size: 0.9rem;
+    color: var(--ml-text);
+    background: var(--ml-gray);
+    border-radius: 6px;
+    padding: 8px 12px;
+    min-height: 36px;
+    word-break: break-word;
+  }
+  .field-view.full { grid-column: 1 / -1; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 30px 10px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #fff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 760px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    overflow: hidden;
+    animation: slideUp 0.22s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .modal-header {
+    background: var(--ml-yellow);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ml-dark);
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #555;
+    line-height: 1;
+  }
+
+  .modal-body { padding: 24px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .form-group label .required { color: var(--ml-danger); }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 9px 12px;
+    border: 1.5px solid var(--ml-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--ml-text);
+    font-family: inherit;
+    transition: border-color 0.2s;
+    background: #fafafa;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--ml-blue);
+    background: #fff;
+  }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+
+  /* NPS Toggle */
+  .nps-toggle {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .nps-option {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid var(--ml-border);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .nps-option.pos:hover { border-color: var(--ml-success); }
+  .nps-option.pos.selected {
+    border-color: var(--ml-success);
+    background: #e6f9ef;
+    color: var(--ml-success);
+  }
+  .nps-option.neg:hover { border-color: var(--ml-danger); }
+  .nps-option.neg.selected {
+    border-color: var(--ml-danger);
+    background: #fdeaea;
+    color: var(--ml-danger);
+  }
+
+  /* Separator */
+  .form-section-title {
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ml-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1.5px solid var(--ml-light-blue);
+    padding-bottom: 6px;
+    margin-top: 6px;
+  }
+
+  /* MODAL FOOTER */
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--ml-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #fafafa;
+  }
+
+  .btn-cancel {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1.5px solid var(--ml-border);
+    background: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #666;
+    transition: background 0.2s;
+  }
+  .btn-cancel:hover { background: #eee; }
+
+  .btn-save {
+    padding: 10px 28px;
+    border-radius: 8px;
+    border: none;
+    background: var(--ml-blue);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-save:hover { background: #2968c8; }
+
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: #aaa;
+  }
+  .empty-state svg { margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 0.95rem; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--ml-dark);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.25s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Análisis NPS — Sub Equipo</h1>
+  <span id="currentDate"></span>
+</header>
+
+<!-- TABS -->
+<div class="tabs-container" id="tabsContainer">
+  <!-- tabs dinámicas -->
+  <button class="add-rep-btn" onclick="addRep()">+ Agregar Representante</button>
+</div>
+
+<!-- CONTENT PANELS -->
+<div class="content" id="contentArea"></div>
+
+<!-- MODAL FORM -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Nuevo Análisis</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+
+        <!-- DATOS BÁSICOS -->
+        <div class="form-section-title">Datos del Caso</div>
+
+        <div class="form-group">
+          <label>CASO <span class="required">*</span></label>
+          <input type="text" id="f_caso" placeholder="Ej: 12345678" />
+        </div>
+
+        <div class="form-group">
+          <label>DATE_ID</label>
+          <input type="date" id="f_date_id" />
+        </div>
+
+        <div class="form-group">
+          <label>LDAP <span class="required">*</span></label>
+          <input type="text" id="f_ldap" placeholder="Ej: jperez" />
+        </div>
+
+        <div class="form-group">
+          <label>MES</label>
+          <select id="f_mes">
+            <option value="">— Seleccionar —</option>
+            <option>Enero</option><option>Febrero</option><option>Marzo</option>
+            <option>Abril</option><option>Mayo</option><option>Junio</option>
+            <option>Julio</option><option>Agosto</option><option>Septiembre</option>
+            <option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>PROCESO</label>
+          <input type="text" id="f_proceso" placeholder="Ej: Devolución, Envío..." />
+        </div>
+
+        <div class="form-group">
+          <label>NPS</label>
+          <div class="nps-toggle">
+            <div class="nps-option pos" id="nps0" onclick="selectNPS(0)">0</div>
+            <div class="nps-option neg" id="npsN1" onclick="selectNPS(-1)">-1</div>
+          </div>
+          <input type="hidden" id="f_nps" value="" />
+        </div>
+
+        <div class="form-group full">
+          <label>COMENTARIO</label>
+          <textarea id="f_comentario" placeholder="Comentario del usuario..."></textarea>
+        </div>
+
+        <!-- CALIDAD -->
+        <div class="form-section-title">Calidad de la Gestión</div>
+
+        <div class="form-group full">
+          <label>Solución</label>
+          <textarea id="f_solucion" placeholder="¿Qué solución se brindó?"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Hubo conexión emocional / personalización?</label>
+          <textarea id="f_conexion" placeholder="Detallá..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Respondimos todas las consultas del usuario?</label>
+          <textarea id="f_consultas" placeholder="Detallá..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Podríamos haber aplicado excepción / visto con TL?</label>
+          <textarea id="f_excepcion" placeholder="Sí / No / Detallá..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>En caso de sí, ¿qué excepción?</label>
+          <textarea id="f_que_excepcion" placeholder="Describí la excepción..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Hubo error operacional?</label>
+          <textarea id="f_error_op" placeholder="Sí / No / Detallá..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Usamos el FA?</label>
+          <textarea id="f_fa" placeholder="Sí / No / Detallá..."></textarea>
+        </div>
+
+        <!-- ANÁLISIS -->
+        <div class="form-section-title">Análisis</div>
+
+        <div class="form-group full">
+          <label>Análisis Propio</label>
+          <textarea id="f_analisis_propio" placeholder="Tu análisis personal del caso..." style="min-height:90px;"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>Análisis del TL</label>
+          <textarea id="f_analisis_tl" placeholder="Análisis del Team Leader..." style="min-height:90px;"></textarea>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveAnalysis()">✅ Cerrar Análisis</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+let state = JSON.parse(localStorage.getItem('nps_state') || '{"reps":[],"analyses":{}}');
+
+// Default reps si es la primera vez
+if (state.reps.length === 0) {
+  state.reps = ['Lucas', 'María', 'Gonzalo', 'Valentina'];
+  state.analyses = {};
+  saveState();
+}
+
+let activeRep = state.reps[0];
+let editingId = null;
+let currentModalRep = null;
+
+function saveState() {
+  localStorage.setItem('nps_state', JSON.stringify(state));
+}
+
+// ── DATE ───────────────────────────────────────────────────────────────────
+document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-AR', {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+
+// ── RENDER TABS ────────────────────────────────────────────────────────────
+function renderTabs() {
+  const container = document.getElementById('tabsContainer');
+  // Remove old tabs (keep last child = add button)
+  while (container.children.length > 1) container.removeChild(container.firstChild);
+
+  state.reps.forEach(rep => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (rep === activeRep ? ' active' : '');
+    btn.textContent = rep;
+    btn.onclick = () => { activeRep = rep; renderTabs(); renderPanels(); };
+    container.insertBefore(btn, container.lastChild);
+  });
+}
+
+// ── RENDER PANELS ──────────────────────────────────────────────────────────
+function renderPanels() {
+  const area = document.getElementById('contentArea');
+  area.innerHTML = '';
+
+  state.reps.forEach(rep => {
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel' + (rep === activeRep ? ' active' : '');
+    panel.id = 'panel_' + rep;
+
+    const analyses = (state.analyses[rep] || []);
+    const count = analyses.length;
+
+    panel.innerHTML = `
+      <div class="panel-header">
+        <h2>👤 ${rep} <span style="font-size:0.85rem;color:#aaa;font-weight:400;">(${count} análisis)</span></h2>
+        <button class="btn-new-analysis" onclick="openModal('${rep}', null)">+ Nuevo Análisis</button>
+      </div>
+      <div class="analysis-list" id="list_${rep}">
+        ${count === 0 ? `
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <rect x="8" y="6" width="32" height="36" rx="3" fill="#e0e0e0"/>
+              <rect x="14" y="14" width="20" height="3" rx="1.5" fill="#bbb"/>
+              <rect x="14" y="21" width="14" height="3" rx="1.5" fill="#bbb"/>
+              <rect x="14" y="28" width="10" height="3" rx="1.5" fill="#bbb"/>
+            </svg>
+            <p>No hay análisis cargados aún.<br>Hacé clic en <strong>+ Nuevo Análisis</strong> para empezar.</p>
+          </div>` : analyses.map(a => renderCard(a, rep)).join('')}
+      </div>`;
+
+    area.appendChild(panel);
+  });
+}
+
+// ── RENDER CARD ────────────────────────────────────────────────────────────
+function renderCard(a, rep) {
+  const npsLabel = a.nps === '0' ? '<span class="badge badge-nps-pos">NPS: 0</span>'
+                : a.nps === '-1' ? '<span class="badge badge-nps-neg">NPS: -1</span>' : '';
+  return `
+  <div class="analysis-card" id="card_${a.id}">
+    <div class="card-summary" onclick="toggleCard('${a.id}')">
+      <div class="card-info">
+        <span class="badge badge-caso">🗂 Caso ${a.caso || '—'}</span>
+        ${a.mes ? `<span class="badge badge-mes">${a.mes}</span>` : ''}
+        ${a.proceso ? `<span class="badge badge-proceso">${a.proceso}</span>` : ''}
+        ${npsLabel}
+        <span class="card-meta">${a.ldap ? 'LDAP: ' + a.ldap : ''} ${a.date_id ? '· ' + a.date_id : ''}</span>
+      </div>
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <button class="btn-edit" onclick="openModal('${rep}', '${a.id}')">✏️ Editar</button>
+        <button class="btn-delete" onclick="deleteAnalysis('${rep}', '${a.id}')">🗑 Eliminar</button>
+      </div>
+    </div>
+    <div class="card-expand" id="expand_${a.id}">
+      <div class="card-expand-inner">
+        ${fieldView('Comentario', a.comentario, true)}
+        ${fieldView('Solución', a.solucion, true)}
+        ${fieldView('Conexión emocional / personalización', a.conexion, true)}
+        ${fieldView('Respondimos todas las consultas', a.consultas, true)}
+        ${fieldView('Podríamos haber aplicado excepción', a.excepcion, false)}
+        ${fieldView('¿Qué excepción?', a.que_excepcion, false)}
+        ${fieldView('Error operacional', a.error_op, false)}
+        ${fieldView('Usamos el FA', a.fa, false)}
+        ${fieldView('Análisis Propio', a.analisis_propio, true)}
+        ${fieldView('Análisis del TL', a.analisis_tl, true)}
+      </div>
+    </div>
+  </div>`;
+}
+
+function fieldView(label, value, full) {
+  if (!value) return '';
+  return `<div class="field-view ${full ? 'full' : ''}">
+    <label>${label}</label>
+    <p>${escapeHtml(value)}</p>
+  </div>`;
+}
+
+function escapeHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function toggleCard(id) {
+  const el = document.getElementById('expand_' + id);
+  el.classList.toggle('open');
+}
+
+// ── MODAL ──────────────────────────────────────────────────────────────────
+function openModal(rep, id) {
+  currentModalRep = rep;
+  editingId = id;
+  clearForm();
+
+  if (id) {
+    const a = (state.analyses[rep] || []).find(x => x.id === id);
+    if (a) fillForm(a);
+    document.getElementById('modalTitle').textContent = '✏️ Editar Análisis';
+  } else {
+    document.getElementById('modalTitle').textContent = '+ Nuevo Análisis';
+    // Pre-fill LDAP con nombre del rep
+    document.getElementById('f_ldap').value = rep.toLowerCase();
+    // Pre-fill fecha de hoy
+    document.getElementById('f_date_id').value = new Date().toISOString().split('T')[0];
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+  currentModalRep = null;
+}
+
+function clearForm() {
+  ['f_caso','f_date_id','f_ldap','f_comentario','f_solucion',
+   'f_conexion','f_consultas','f_excepcion','f_que_excepcion',
+   'f_error_op','f_fa','f_analisis_propio','f_analisis_tl'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f_mes').value = '';
+  document.getElementById('f_proceso').value = '';
+  document.getElementById('f_nps').value = '';
+  document.getElementById('nps0').classList.remove('selected');
+  document.getElementById('npsN1').classList.remove('selected');
+}
+
+function fillForm(a) {
+  document.getElementById('f_caso').value        = a.caso || '';
+  document.getElementById('f_date_id').value     = a.date_id || '';
+  document.getElementById('f_ldap').value        = a.ldap || '';
+  document.getElementById('f_mes').value         = a.mes || '';
+  document.getElementById('f_proceso').value     = a.proceso || '';
+  document.getElementById('f_comentario').value  = a.comentario || '';
+  document.getElementById('f_solucion').value    = a.solucion || '';
+  document.getElementById('f_conexion').value    = a.conexion || '';
+  document.getElementById('f_consultas').value   = a.consultas || '';
+  document.getElementById('f_excepcion').value   = a.excepcion || '';
+  document.getElementById('f_que_excepcion').value = a.que_excepcion || '';
+  document.getElementById('f_error_op').value    = a.error_op || '';
+  document.getElementById('f_fa').value          = a.fa || '';
+  document.getElementById('f_analisis_propio').value = a.analisis_propio || '';
+  document.getElementById('f_analisis_tl').value = a.analisis_tl || '';
+  document.getElementById('f_nps').value         = a.nps || '';
+  if (a.nps === '0')  document.getElementById('nps0').classList.add('selected');
+  if (a.nps === '-1') document.getElementById('npsN1').classList.add('selected');
+}
+
+function selectNPS(val) {
+  document.getElementById('f_nps').value = String(val);
+  document.getElementById('nps0').classList.toggle('selected',   val === 0);
+  document.getElementById('npsN1').classList.toggle('selected', val === -1);
+}
+
+// ── SAVE ───────────────────────────────────────────────────────────────────
+function saveAnalysis() {
+  const caso = document.getElementById('f_caso').value.trim();
+  const ldap = document.getElementById('f_ldap').value.trim();
+  if (!caso) { showToast('⚠️ El campo CASO es obligatorio.'); return; }
+  if (!ldap) { showToast('⚠️ El campo LDAP es obligatorio.');  return; }
+
+  const data = {
+    id:             editingId || Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    caso,
+    date_id:        document.getElementById('f_date_id').value,
+    ldap,
+    mes:            document.getElementById('f_mes').value,
+    proceso:        document.getElementById('f_proceso').value.trim(),
+    comentario:     document.getElementById('f_comentario').value.trim(),
+    nps:            document.getElementById('f_nps').value,
+    solucion:       document.getElementById('f_solucion').value.trim(),
+    conexion:       document.getElementById('f_conexion').value.trim(),
+    consultas:      document.getElementById('f_consultas').value.trim(),
+    excepcion:      document.getElementById('f_excepcion').value.trim(),
+    que_excepcion:  document.getElementById('f_que_excepcion').value.trim(),
+    error_op:       document.getElementById('f_error_op').value.trim(),
+    fa:             document.getElementById('f_fa').value.trim(),
+    analisis_propio: document.getElementById('f_analisis_propio').value.trim(),
+    analisis_tl:    document.getElementById('f_analisis_tl').value.trim(),
+    timestamp:      new Date().toISOString()
+  };
+
+  if (!state.analyses[currentModalRep]) state.analyses[currentModalRep] = [];
+
+  if (editingId) {
+    const idx = state.analyses[currentModalRep].findIndex(x => x.id === editingId);
+    if (idx !== -1) state.analyses[currentModalRep][idx] = data;
+    showToast('✅ Análisis actualizado.');
+  } else {
+    state.analyses[currentModalRep].push(data);
+    showToast('✅ Análisis cerrado y guardado.');
+  }
+
+  saveState();
+  closeModal();
+  renderPanels();
+}
+
+// ── DELETE ─────────────────────────────────────────────────────────────────
+function deleteAnalysis(rep, id) {
+  if (!confirm('¿Eliminar este análisis? Esta acción no se puede deshacer.')) return;
+  state.analyses[rep] = (state.analyses[rep] || []).filter(x => x.id !== id);
+  saveState();
+  renderPanels();
+  showToast('🗑 Análisis eliminado.');
+}
+
+// ── ADD REP ────────────────────────────────────────────────────────────────
+function addRep() {
+  const name = prompt('Nombre del representante:');
+  if (!name || !name.trim()) return;
+  const rep = name.trim();
+  if (state.reps.includes(rep)) { showToast('⚠️ Ya existe ese representante.'); return; }
+  state.reps.push(rep);
+  state.analyses[rep] = [];
+  activeRep = rep;
+  saveState();
+  renderTabs();
+  renderPanels();
+  showToast('✅ Representante agregado.');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+renderTabs();
+renderPanels();
+</script>
+</body>
+</html>
