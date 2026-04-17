@@ -1,471 +1,644 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Análisis NPS - Sub Equipo</title>
+<title>Análisis NPS — Sub Equipo</title>
 <style>
   :root {
-    --ml-yellow: #FFE600;
-    --ml-blue: #3483FA;
-    --ml-dark: #1a1a2e;
-    --ml-light-blue: #e8f0fe;
-    --ml-gray: #f5f5f5;
-    --ml-border: #d9d9d9;
-    --ml-text: #333;
-    --ml-success: #00a650;
-    --ml-danger: #e22929;
-    --ml-warning: #ff7733;
+    --blue:       #3483FA;
+    --blue-dark:  #1A56C4;
+    --blue-light: #EAF2FF;
+    --yellow:     #FFE600;
+    --green:      #00A650;
+    --green-light:#E6F9EF;
+    --red:        #E22929;
+    --red-light:  #FDEAEA;
+    --gray-100:   #F7F8FA;
+    --gray-200:   #EAECF0;
+    --gray-300:   #D0D5DD;
+    --gray-500:   #667085;
+    --gray-700:   #344054;
+    --gray-900:   #101828;
+    --white:      #FFFFFF;
+    --shadow-sm:  0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
+    --shadow-md:  0 4px 8px -2px rgba(16,24,40,0.1), 0 2px 4px -2px rgba(16,24,40,0.06);
+    --shadow-lg:  0 12px 40px -4px rgba(16,24,40,0.14), 0 4px 12px -4px rgba(16,24,40,0.08);
+    --radius:     10px;
+    --radius-lg:  14px;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f0f2f5;
-    color: var(--ml-text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    min-height: 100vh;
   }
 
-  /* HEADER */
+  /* ── HEADER ── */
   header {
-    background: var(--ml-yellow);
-    padding: 14px 30px;
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 60%, #0F3460 100%);
+    padding: 0 32px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 200;
+    box-shadow: var(--shadow-md);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    background: var(--yellow);
+    border-radius: 8px;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
   }
   header h1 {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 700;
-    color: var(--ml-dark);
-    letter-spacing: 0.3px;
+    color: var(--white);
+    letter-spacing: 0.2px;
   }
-  header span {
-    font-size: 0.85rem;
-    color: #555;
-    font-weight: 500;
+  header h1 span { color: var(--yellow); }
+  .header-date {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.07);
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
   }
 
-  /* TABS */
-  .tabs-container {
-    background: #fff;
-    padding: 0 20px;
-    border-bottom: 2px solid var(--ml-border);
+  /* ── TABS ── */
+  .tabs-wrapper {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky;
+    top: 64px;
+    z-index: 199;
+    box-shadow: var(--shadow-sm);
+  }
+  .tabs-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     overflow-x: auto;
-    position: sticky;
-    top: 55px;
-    z-index: 99;
   }
   .tab-btn {
-    padding: 12px 20px;
+    padding: 16px 20px 14px;
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    color: #888;
+    color: var(--gray-500);
     border-bottom: 3px solid transparent;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .tab-btn:hover { color: var(--ml-blue); }
-  .tab-btn.active {
-    color: var(--ml-blue);
-    border-bottom-color: var(--ml-blue);
+  .tab-btn .tab-count {
+    background: var(--gray-200);
+    color: var(--gray-500);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 0.72rem;
+    font-weight: 700;
   }
-  .add-rep-btn {
+  .tab-btn:hover { color: var(--blue); }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab-btn.active .tab-count { background: var(--blue-light); color: var(--blue); }
+  .btn-add-rep {
     margin-left: auto;
-    padding: 8px 14px;
-    background: var(--ml-blue);
-    color: #fff;
+    padding: 7px 14px;
+    background: var(--blue);
+    color: var(--white);
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: 0.78rem;
+    font-weight: 700;
     white-space: nowrap;
-    transition: background 0.2s;
+    transition: background 0.18s;
+    flex-shrink: 0;
   }
-  .add-rep-btn:hover { background: #2968c8; }
+  .btn-add-rep:hover { background: var(--blue-dark); }
 
-  /* MAIN CONTENT */
+  /* ── CONTENT ── */
   .content {
-    max-width: 1100px;
-    margin: 30px auto;
-    padding: 0 20px;
+    max-width: 1140px;
+    margin: 28px auto;
+    padding: 0 24px;
   }
-
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  /* PANEL HEADER */
   .panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  .panel-header h2 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--ml-dark);
-  }
-  .btn-new-analysis {
-    background: var(--ml-success);
-    color: #fff;
+  .panel-header-left h2 { font-size: 1.15rem; font-weight: 700; color: var(--gray-900); }
+  .panel-header-left p { font-size: 0.82rem; color: var(--gray-500); margin-top: 2px; }
+
+  .btn-new {
+    background: var(--blue);
+    color: var(--white);
     border: none;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: background 0.2s;
+    gap: 7px;
+    box-shadow: 0 2px 8px rgba(52,131,250,0.35);
+    transition: all 0.18s;
   }
-  .btn-new-analysis:hover { background: #008a42; }
+  .btn-new:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(52,131,250,0.4); }
 
-  /* ANALYSIS CARDS LIST */
-  .analysis-list { display: flex; flex-direction: column; gap: 14px; }
+  /* ── CARDS ── */
+  .analysis-list { display: flex; flex-direction: column; gap: 12px; }
 
   .analysis-card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid var(--ml-border);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
+    transition: box-shadow 0.18s;
   }
+  .analysis-card:hover { box-shadow: var(--shadow-md); }
 
-  .card-summary {
-    padding: 16px 20px;
+  .card-header {
+    padding: 14px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
     gap: 10px;
     flex-wrap: wrap;
+    transition: background 0.15s;
   }
-  .card-summary:hover { background: var(--ml-gray); }
+  .card-header:hover { background: var(--gray-100); }
 
-  .card-info {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
+  .card-badges { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
   .badge {
-    padding: 3px 10px;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 700;
+    letter-spacing: 0.2px;
   }
-  .badge-caso { background: var(--ml-light-blue); color: var(--ml-blue); }
-  .badge-mes { background: #fff3e0; color: #e65c00; }
-  .badge-nps-pos { background: #e6f9ef; color: var(--ml-success); }
-  .badge-nps-neg { background: #fdeaea; color: var(--ml-danger); }
-  .badge-proceso { background: #f3e8ff; color: #7b2ff7; }
+  .b-caso    { background: var(--blue-light); color: var(--blue); }
+  .b-mes     { background: #FFF3E0; color: #E65C00; }
+  .b-proceso { background: #F3E8FF; color: #6B21A8; }
+  .b-nps0    { background: var(--green-light); color: var(--green); }
+  .b-npsN1   { background: var(--red-light); color: var(--red); }
+  .b-ldap    { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
 
-  .card-meta { font-size: 0.82rem; color: #888; }
+  .card-meta { font-size: 0.78rem; color: var(--gray-500); margin-left: 4px; }
 
-  .card-actions { display: flex; gap: 8px; }
-  .btn-edit, .btn-delete {
-    padding: 5px 14px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+  .card-actions { display: flex; gap: 6px; align-items: center; }
+  .btn-sm {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
-  .btn-edit { background: var(--ml-light-blue); color: var(--ml-blue); }
-  .btn-edit:hover { background: #c3d8fd; }
-  .btn-delete { background: #fdeaea; color: var(--ml-danger); }
-  .btn-delete:hover { background: #f7c5c5; }
+  .btn-preview { background: #F3E8FF; color: #6B21A8; }
+  .btn-preview:hover { background: #E9D5FF; }
+  .btn-edit2 { background: var(--blue-light); color: var(--blue); }
+  .btn-edit2:hover { background: #c3d8fd; }
+  .btn-del { background: var(--red-light); color: var(--red); }
+  .btn-del:hover { background: #f7c5c5; }
 
-  .card-expand { display: none; border-top: 1px solid var(--ml-border); }
+  .chevron {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    transition: transform 0.2s;
+    margin-left: 4px;
+  }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* CARD EXPAND — vista compacta */
+  .card-expand { display: none; border-top: 1px solid var(--gray-200); }
   .card-expand.open { display: block; }
-
   .card-expand-inner {
-    padding: 20px;
+    padding: 18px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px 24px;
+    gap: 12px 20px;
   }
-  @media (max-width: 700px) {
-    .card-expand-inner { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 680px) { .card-expand-inner { grid-template-columns: 1fr; } }
 
-  .field-view label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    display: block;
-    margin-bottom: 4px;
-  }
-  .field-view p {
-    font-size: 0.9rem;
-    color: var(--ml-text);
-    background: var(--ml-gray);
-    border-radius: 6px;
-    padding: 8px 12px;
-    min-height: 36px;
-    word-break: break-word;
-  }
+  .field-view { display: flex; flex-direction: column; gap: 4px; }
   .field-view.full { grid-column: 1 / -1; }
+  .field-view label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .field-view .fval {
+    font-size: 0.88rem;
+    color: var(--gray-700);
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: 8px 12px;
+    min-height: 34px;
+    word-break: break-word;
+    line-height: 1.5;
+  }
+  .yn-yes { color: var(--green); font-weight: 700; }
+  .yn-no  { color: var(--red);   font-weight: 700; }
 
-  /* MODAL */
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-500);
+  }
+  .empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 0.9rem; line-height: 1.6; }
+
+  /* ── MODAL ── */
   .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(16,24,40,0.55);
     z-index: 999;
     align-items: flex-start;
     justify-content: center;
     overflow-y: auto;
-    padding: 30px 10px;
+    padding: 28px 12px;
+    backdrop-filter: blur(3px);
   }
   .modal-overlay.open { display: flex; }
 
   .modal {
-    background: #fff;
-    border-radius: 14px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
     width: 100%;
-    max-width: 760px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    max-width: 780px;
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
-    animation: slideUp 0.22s ease;
+    animation: slideUp 0.22s cubic-bezier(.16,1,.3,1);
   }
   @keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
+    from { transform: translateY(24px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
 
   .modal-header {
-    background: var(--ml-yellow);
-    padding: 16px 24px;
+    background: linear-gradient(135deg, #1A1A2E, #0F3460);
+    padding: 18px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  .modal-header h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--ml-dark);
+  .modal-header-left { display: flex; align-items: center; gap: 10px; }
+  .modal-header-icon {
+    background: var(--yellow);
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
   }
+  .modal-header h3 { font-size: 1rem; font-weight: 700; color: var(--white); }
   .modal-close {
-    background: none;
+    background: rgba(255,255,255,0.12);
     border: none;
-    font-size: 1.4rem;
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    font-size: 1rem;
     cursor: pointer;
-    color: #555;
-    line-height: 1;
+    color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
   }
+  .modal-close:hover { background: rgba(255,255,255,0.22); }
 
-  .modal-body { padding: 24px; }
+  /* SECTION HEADERS */
+  .form-section {
+    padding: 0 24px;
+    margin-top: 20px;
+  }
+  .section-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--blue);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue-light);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px 20px;
-    margin-bottom: 10px;
+    gap: 14px 18px;
   }
-  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 580px) { .form-grid { grid-template-columns: 1fr; } }
 
   .form-group { display: flex; flex-direction: column; gap: 5px; }
   .form-group.full { grid-column: 1 / -1; }
 
   .form-group label {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 700;
-    color: #555;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
+    color: var(--gray-700);
+    letter-spacing: 0.2px;
   }
-  .form-group label .required { color: var(--ml-danger); }
+  .req { color: var(--red); }
 
   .form-group input,
   .form-group select,
   .form-group textarea {
     padding: 9px 12px;
-    border: 1.5px solid var(--ml-border);
+    border: 1.5px solid var(--gray-300);
     border-radius: 8px;
-    font-size: 0.9rem;
-    color: var(--ml-text);
+    font-size: 0.88rem;
+    color: var(--gray-900);
     font-family: inherit;
-    transition: border-color 0.2s;
-    background: #fafafa;
+    background: var(--white);
+    transition: border-color 0.18s, box-shadow 0.18s;
   }
   .form-group input:focus,
   .form-group select:focus,
   .form-group textarea:focus {
     outline: none;
-    border-color: var(--ml-blue);
-    background: #fff;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(52,131,250,0.14);
   }
-  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-group textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
 
-  /* NPS Toggle */
-  .nps-toggle {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-top: 4px;
-  }
-  .nps-option {
+  /* NPS TOGGLE */
+  .nps-row { display: flex; gap: 10px; }
+  .nps-opt {
     flex: 1;
     text-align: center;
     padding: 10px;
     border-radius: 8px;
-    border: 2px solid var(--ml-border);
+    border: 2px solid var(--gray-300);
     cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
+    font-weight: 800;
+    font-size: 1.05rem;
     transition: all 0.15s;
     user-select: none;
   }
-  .nps-option.pos:hover { border-color: var(--ml-success); }
-  .nps-option.pos.selected {
-    border-color: var(--ml-success);
-    background: #e6f9ef;
-    color: var(--ml-success);
-  }
-  .nps-option.neg:hover { border-color: var(--ml-danger); }
-  .nps-option.neg.selected {
-    border-color: var(--ml-danger);
-    background: #fdeaea;
-    color: var(--ml-danger);
-  }
+  .nps-opt.pos.sel { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .nps-opt.neg.sel { border-color: var(--red);   background: var(--red-light);   color: var(--red); }
+  .nps-opt:hover { border-color: var(--blue); }
 
-  /* Separator */
-  .form-section-title {
-    grid-column: 1 / -1;
-    font-size: 0.8rem;
+  /* YES/NO TOGGLE */
+  .yn-row { display: flex; gap: 8px; }
+  .yn-opt {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--gray-300);
+    cursor: pointer;
     font-weight: 700;
-    color: var(--ml-blue);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1.5px solid var(--ml-light-blue);
-    padding-bottom: 6px;
-    margin-top: 6px;
+    font-size: 0.88rem;
+    transition: all 0.15s;
+    user-select: none;
+    color: var(--gray-500);
   }
+  .yn-opt.y.sel { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .yn-opt.n.sel { border-color: var(--red);   background: var(--red-light);   color: var(--red); }
+  .yn-opt:hover { opacity: 0.85; }
 
   /* MODAL FOOTER */
   .modal-footer {
-    padding: 16px 24px;
-    border-top: 1px solid var(--ml-border);
+    padding: 16px 24px 20px;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    background: #fafafa;
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-100);
+    margin-top: 20px;
   }
-
-  .btn-cancel {
-    padding: 10px 24px;
-    border-radius: 8px;
-    border: 1.5px solid var(--ml-border);
-    background: #fff;
-    font-size: 0.9rem;
+  .btn-cancel2 {
+    padding: 9px 20px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--gray-300);
+    background: var(--white);
+    font-size: 0.88rem;
     font-weight: 600;
     cursor: pointer;
-    color: #666;
-    transition: background 0.2s;
+    color: var(--gray-700);
+    transition: all 0.15s;
   }
-  .btn-cancel:hover { background: #eee; }
-
-  .btn-save {
-    padding: 10px 28px;
-    border-radius: 8px;
+  .btn-cancel2:hover { background: var(--gray-200); }
+  .btn-save2 {
+    padding: 9px 24px;
+    border-radius: var(--radius);
     border: none;
-    background: var(--ml-blue);
-    color: #fff;
-    font-size: 0.9rem;
+    background: var(--blue);
+    color: var(--white);
+    font-size: 0.88rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(52,131,250,0.3);
+    transition: all 0.18s;
   }
-  .btn-save:hover { background: #2968c8; }
+  .btn-save2:hover { background: var(--blue-dark); transform: translateY(-1px); }
 
-  .empty-state {
-    text-align: center;
-    padding: 50px 20px;
-    color: #aaa;
+  /* ── PREVIEW MODAL ── */
+  .preview-modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 680px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: slideUp 0.22s cubic-bezier(.16,1,.3,1);
   }
-  .empty-state svg { margin-bottom: 12px; opacity: 0.4; }
-  .empty-state p { font-size: 0.95rem; }
+  .preview-header {
+    background: linear-gradient(135deg, #6B21A8, #9333EA);
+    padding: 16px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .preview-header h3 { font-size: 0.98rem; font-weight: 700; color: var(--white); }
 
-  /* Toast */
+  .preview-body { padding: 20px 22px; max-height: 70vh; overflow-y: auto; }
+
+  .preview-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .preview-row:last-child { border-bottom: none; }
+  .preview-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    min-width: 160px;
+    padding-top: 2px;
+  }
+  .preview-value {
+    font-size: 0.88rem;
+    color: var(--gray-900);
+    flex: 1;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .btn-copy-field {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--gray-700);
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-copy-field:hover { background: var(--blue-light); color: var(--blue); border-color: var(--blue); }
+  .btn-copy-field.copied { background: var(--green-light); color: var(--green); border-color: var(--green); }
+
+  .preview-footer {
+    padding: 14px 22px;
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-100);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .btn-copy-all {
+    background: var(--blue);
+    color: var(--white);
+    border: none;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-copy-all:hover { background: var(--blue-dark); }
+
+  /* ── TOAST ── */
   .toast {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: var(--ml-dark);
-    color: #fff;
-    padding: 12px 22px;
+    bottom: 28px;
+    right: 28px;
+    background: var(--gray-900);
+    color: var(--white);
+    padding: 11px 20px;
     border-radius: 10px;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 600;
     z-index: 9999;
     opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.25s;
+    transform: translateY(8px);
+    transition: all 0.22s;
     pointer-events: none;
+    border-left: 4px solid var(--yellow);
   }
   .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 10px; }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
-  <h1>📊 Análisis NPS — Sub Equipo</h1>
-  <span id="currentDate"></span>
+  <div class="header-left">
+    <div class="header-logo">📊</div>
+    <h1>Análisis <span>NPS</span> — Sub Equipo</h1>
+  </div>
+  <div class="header-date" id="currentDate"></div>
 </header>
 
 <!-- TABS -->
-<div class="tabs-container" id="tabsContainer">
-  <!-- tabs dinámicas -->
-  <button class="add-rep-btn" onclick="addRep()">+ Agregar Representante</button>
+<div class="tabs-wrapper">
+  <div class="tabs-inner" id="tabsInner">
+    <button class="btn-add-rep" onclick="addRep()">+ Agregar</button>
+  </div>
 </div>
 
-<!-- CONTENT PANELS -->
+<!-- CONTENT -->
 <div class="content" id="contentArea"></div>
 
-<!-- MODAL FORM -->
+<!-- ══ MODAL FORMULARIO ══ -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-header">
-      <h3 id="modalTitle">Nuevo Análisis</h3>
+      <div class="modal-header-left">
+        <div class="modal-header-icon">📝</div>
+        <h3 id="modalTitle">Nuevo Análisis</h3>
+      </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="modal-body">
+
+    <!-- SECCIÓN: DATOS DEL CASO -->
+    <div class="form-section">
+      <div class="section-title">🗂 Datos del Caso</div>
       <div class="form-grid">
 
-        <!-- DATOS BÁSICOS -->
-        <div class="form-section-title">Datos del Caso</div>
-
         <div class="form-group">
-          <label>CASO <span class="required">*</span></label>
-          <input type="text" id="f_caso" placeholder="Ej: 12345678" />
+          <label>CASO <span class="req">*</span></label>
+          <input type="text" id="f_caso" placeholder="Ej: 12345678"/>
         </div>
 
         <div class="form-group">
           <label>DATE_ID</label>
-          <input type="date" id="f_date_id" />
+          <input type="date" id="f_date_id"/>
         </div>
 
         <div class="form-group">
-          <label>LDAP <span class="required">*</span></label>
-          <input type="text" id="f_ldap" placeholder="Ej: jperez" />
+          <label>LDAP <span class="req">*</span></label>
+          <select id="f_ldap">
+            <option value="">— Seleccionar —</option>
+            <option value="vstraconi">vstraconi</option>
+            <option value="nloyatekauff">nloyatekauff</option>
+            <option value="ratayvigo">ratayvigo</option>
+            <option value="jhvaldez">jhvaldez</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -481,79 +654,150 @@
 
         <div class="form-group">
           <label>PROCESO</label>
-          <input type="text" id="f_proceso" placeholder="Ej: Devolución, Envío..." />
+          <select id="f_proceso">
+            <option value="">— Seleccionar —</option>
+            <option>Arrepentimiento</option>
+            <option>Defectuoso</option>
+            <option>Caja Vacía</option>
+            <option>Diferente</option>
+            <option>Apelaciones</option>
+            <option>Incompleto</option>
+          </select>
         </div>
 
         <div class="form-group">
           <label>NPS</label>
-          <div class="nps-toggle">
-            <div class="nps-option pos" id="nps0" onclick="selectNPS(0)">0</div>
-            <div class="nps-option neg" id="npsN1" onclick="selectNPS(-1)">-1</div>
+          <div class="nps-row">
+            <div class="nps-opt pos" id="nps0" onclick="selectNPS(0)">0</div>
+            <div class="nps-opt neg" id="npsN1" onclick="selectNPS(-1)">-1</div>
           </div>
-          <input type="hidden" id="f_nps" value="" />
+          <input type="hidden" id="f_nps"/>
         </div>
 
         <div class="form-group full">
           <label>COMENTARIO</label>
-          <textarea id="f_comentario" placeholder="Comentario del usuario..."></textarea>
-        </div>
-
-        <!-- CALIDAD -->
-        <div class="form-section-title">Calidad de la Gestión</div>
-
-        <div class="form-group full">
-          <label>Solución</label>
-          <textarea id="f_solucion" placeholder="¿Qué solución se brindó?"></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label>¿Hubo conexión emocional / personalización?</label>
-          <textarea id="f_conexion" placeholder="Detallá..."></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label>¿Respondimos todas las consultas del usuario?</label>
-          <textarea id="f_consultas" placeholder="Detallá..."></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label>¿Podríamos haber aplicado excepción / visto con TL?</label>
-          <textarea id="f_excepcion" placeholder="Sí / No / Detallá..."></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label>En caso de sí, ¿qué excepción?</label>
-          <textarea id="f_que_excepcion" placeholder="Describí la excepción..."></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label>¿Hubo error operacional?</label>
-          <textarea id="f_error_op" placeholder="Sí / No / Detallá..."></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label>¿Usamos el FA?</label>
-          <textarea id="f_fa" placeholder="Sí / No / Detallá..."></textarea>
-        </div>
-
-        <!-- ANÁLISIS -->
-        <div class="form-section-title">Análisis</div>
-
-        <div class="form-group full">
-          <label>Análisis Propio</label>
-          <textarea id="f_analisis_propio" placeholder="Tu análisis personal del caso..." style="min-height:90px;"></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label>Análisis del TL</label>
-          <textarea id="f_analisis_tl" placeholder="Análisis del Team Leader..." style="min-height:90px;"></textarea>
+          <textarea id="f_comentario" placeholder="Comentario del usuario en la encuesta..."></textarea>
         </div>
 
       </div>
     </div>
+
+    <!-- SECCIÓN: CALIDAD DE GESTIÓN -->
+    <div class="form-section">
+      <div class="section-title">✅ Calidad de la Gestión</div>
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label>Solución</label>
+          <textarea id="f_solucion" placeholder="¿Qué solución se brindó al usuario?"></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Hubo conexión emocional / personalización?</label>
+          <div class="yn-row" id="yn_conexion">
+            <div class="yn-opt y" onclick="selectYN('conexion','si')">✅ Sí</div>
+            <div class="yn-opt n" onclick="selectYN('conexion','no')">❌ No</div>
+          </div>
+          <input type="hidden" id="f_conexion"/>
+        </div>
+
+        <div class="form-group full">
+          <label>Detalle — Conexión emocional</label>
+          <textarea id="f_conexion_detalle" placeholder="Explicá brevemente..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Respondimos todas las consultas del usuario?</label>
+          <div class="yn-row" id="yn_consultas">
+            <div class="yn-opt y" onclick="selectYN('consultas','si')">✅ Sí</div>
+            <div class="yn-opt n" onclick="selectYN('consultas','no')">❌ No</div>
+          </div>
+          <input type="hidden" id="f_consultas"/>
+        </div>
+
+        <div class="form-group full">
+          <label>Detalle — Consultas respondidas</label>
+          <textarea id="f_consultas_detalle" placeholder="Explicá brevemente..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Podríamos haber aplicado excepción / visto con TL?</label>
+          <div class="yn-row" id="yn_excepcion">
+            <div class="yn-opt y" onclick="selectYN('excepcion','si')">✅ Sí</div>
+            <div class="yn-opt n" onclick="selectYN('excepcion','no')">❌ No</div>
+          </div>
+          <input type="hidden" id="f_excepcion"/>
+        </div>
+
+        <div class="form-group full">
+          <label>En caso de sí, ¿qué excepción?</label>
+          <textarea id="f_que_excepcion" placeholder="Describí la excepción posible..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Hubo error operacional?</label>
+          <div class="yn-row" id="yn_error_op">
+            <div class="yn-opt y" onclick="selectYN('error_op','si')">✅ Sí</div>
+            <div class="yn-opt n" onclick="selectYN('error_op','no')">❌ No</div>
+          </div>
+          <input type="hidden" id="f_error_op"/>
+        </div>
+
+        <div class="form-group full">
+          <label>Detalle — Error operacional</label>
+          <textarea id="f_error_op_detalle" placeholder="Explicá brevemente..."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>¿Usamos el FA?</label>
+          <div class="yn-row" id="yn_fa">
+            <div class="yn-opt y" onclick="selectYN('fa','si')">✅ Sí</div>
+            <div class="yn-opt n" onclick="selectYN('fa','no')">❌ No</div>
+          </div>
+          <input type="hidden" id="f_fa"/>
+        </div>
+
+        <div class="form-group full">
+          <label>Detalle — FA</label>
+          <textarea id="f_fa_detalle" placeholder="Explicá brevemente..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECCIÓN: ANÁLISIS -->
+    <div class="form-section">
+      <div class="section-title">🧠 Análisis</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Análisis Propio</label>
+          <textarea id="f_analisis_propio" style="min-height:90px" placeholder="Tu análisis personal del caso..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Análisis del TL</label>
+          <textarea id="f_analisis_tl" style="min-height:90px" placeholder="Análisis del Team Leader..."></textarea>
+        </div>
+      </div>
+    </div>
+
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveAnalysis()">✅ Cerrar Análisis</button>
+      <button class="btn-cancel2" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save2" onclick="saveAnalysis()">✅ Cerrar Análisis</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL PREVIEW ══ -->
+<div class="modal-overlay" id="previewOverlay">
+  <div class="preview-modal">
+    <div class="preview-header">
+      <h3 id="previewTitle">👁 Vista Previa — Caso</h3>
+      <button class="modal-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="preview-body" id="previewBody"></div>
+    <div class="preview-footer">
+      <button class="btn-cancel2" onclick="closePreview()">Cerrar</button>
+      <button class="btn-copy-all" onclick="copyAll()">📋 Copiar todo para Excel</button>
     </div>
   </div>
 </div>
@@ -561,276 +805,368 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────────────
-let state = JSON.parse(localStorage.getItem('nps_state') || '{"reps":[],"analyses":{}}');
+// ── STATE ────────────────────────────────────────────────────────────────
+let state = JSON.parse(localStorage.getItem('nps_v2') || 'null');
 
-// Default reps si es la primera vez
-if (state.reps.length === 0) {
-  state.reps = ['Lucas', 'María', 'Gonzalo', 'Valentina'];
-  state.analyses = {};
+if (!state) {
+  state = {
+    reps: ['Valentin', 'Renzo', 'Belen', 'Nahuel'],
+    analyses: { Valentin: [], Renzo: [], Belen: [], Nahuel: [] }
+  };
   saveState();
 }
 
-let activeRep = state.reps[0];
-let editingId = null;
-let currentModalRep = null;
+let activeRep    = state.reps[0];
+let editingId    = null;
+let currentRep   = null;
+let previewData  = null;
 
-function saveState() {
-  localStorage.setItem('nps_state', JSON.stringify(state));
-}
+// yn tracking
+const ynKeys = ['conexion','consultas','excepcion','error_op','fa'];
 
-// ── DATE ───────────────────────────────────────────────────────────────────
-document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-AR', {
-  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-});
+function saveState() { localStorage.setItem('nps_v2', JSON.stringify(state)); }
 
-// ── RENDER TABS ────────────────────────────────────────────────────────────
+// ── DATE ─────────────────────────────────────────────────────────────────
+document.getElementById('currentDate').textContent =
+  new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// ── RENDER TABS ──────────────────────────────────────────────────────────
 function renderTabs() {
-  const container = document.getElementById('tabsContainer');
-  // Remove old tabs (keep last child = add button)
-  while (container.children.length > 1) container.removeChild(container.firstChild);
-
+  const inner = document.getElementById('tabsInner');
+  while (inner.children.length > 1) inner.removeChild(inner.firstChild);
   state.reps.forEach(rep => {
+    const count = (state.analyses[rep] || []).length;
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (rep === activeRep ? ' active' : '');
-    btn.textContent = rep;
+    btn.innerHTML = `${rep} <span class="tab-count">${count}</span>`;
     btn.onclick = () => { activeRep = rep; renderTabs(); renderPanels(); };
-    container.insertBefore(btn, container.lastChild);
+    inner.insertBefore(btn, inner.lastChild);
   });
 }
 
-// ── RENDER PANELS ──────────────────────────────────────────────────────────
+// ── RENDER PANELS ────────────────────────────────────────────────────────
 function renderPanels() {
   const area = document.getElementById('contentArea');
   area.innerHTML = '';
-
   state.reps.forEach(rep => {
-    const panel = document.createElement('div');
+    const panel   = document.createElement('div');
     panel.className = 'tab-panel' + (rep === activeRep ? ' active' : '');
-    panel.id = 'panel_' + rep;
-
-    const analyses = (state.analyses[rep] || []);
-    const count = analyses.length;
-
+    const list    = (state.analyses[rep] || []);
     panel.innerHTML = `
       <div class="panel-header">
-        <h2>👤 ${rep} <span style="font-size:0.85rem;color:#aaa;font-weight:400;">(${count} análisis)</span></h2>
-        <button class="btn-new-analysis" onclick="openModal('${rep}', null)">+ Nuevo Análisis</button>
+        <div class="panel-header-left">
+          <h2>👤 ${rep}</h2>
+          <p>${list.length} análisis guardados</p>
+        </div>
+        <button class="btn-new" onclick="openModal('${rep}', null)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Nuevo Análisis
+        </button>
       </div>
-      <div class="analysis-list" id="list_${rep}">
-        ${count === 0 ? `
+      <div class="analysis-list">
+        ${list.length === 0 ? `
           <div class="empty-state">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <rect x="8" y="6" width="32" height="36" rx="3" fill="#e0e0e0"/>
-              <rect x="14" y="14" width="20" height="3" rx="1.5" fill="#bbb"/>
-              <rect x="14" y="21" width="14" height="3" rx="1.5" fill="#bbb"/>
-              <rect x="14" y="28" width="10" height="3" rx="1.5" fill="#bbb"/>
-            </svg>
-            <p>No hay análisis cargados aún.<br>Hacé clic en <strong>+ Nuevo Análisis</strong> para empezar.</p>
-          </div>` : analyses.map(a => renderCard(a, rep)).join('')}
+            <div class="empty-icon">📋</div>
+            <p>No hay análisis cargados aún.<br>Hacé clic en <strong>Nuevo Análisis</strong> para empezar.</p>
+          </div>` : list.slice().reverse().map(a => cardHTML(a, rep)).join('')}
       </div>`;
-
     area.appendChild(panel);
   });
 }
 
-// ── RENDER CARD ────────────────────────────────────────────────────────────
-function renderCard(a, rep) {
-  const npsLabel = a.nps === '0' ? '<span class="badge badge-nps-pos">NPS: 0</span>'
-                : a.nps === '-1' ? '<span class="badge badge-nps-neg">NPS: -1</span>' : '';
+// ── CARD HTML ────────────────────────────────────────────────────────────
+function cardHTML(a, rep) {
+  const npsB = a.nps === '0' ? `<span class="badge b-nps0">NPS 0</span>`
+             : a.nps === '-1' ? `<span class="badge b-npsN1">NPS -1</span>` : '';
   return `
   <div class="analysis-card" id="card_${a.id}">
-    <div class="card-summary" onclick="toggleCard('${a.id}')">
-      <div class="card-info">
-        <span class="badge badge-caso">🗂 Caso ${a.caso || '—'}</span>
-        ${a.mes ? `<span class="badge badge-mes">${a.mes}</span>` : ''}
-        ${a.proceso ? `<span class="badge badge-proceso">${a.proceso}</span>` : ''}
-        ${npsLabel}
-        <span class="card-meta">${a.ldap ? 'LDAP: ' + a.ldap : ''} ${a.date_id ? '· ' + a.date_id : ''}</span>
+    <div class="card-header" onclick="toggleCard('${a.id}')">
+      <div class="card-badges">
+        <span class="badge b-caso">🗂 ${a.caso || '—'}</span>
+        ${a.mes     ? `<span class="badge b-mes">${a.mes}</span>` : ''}
+        ${a.proceso ? `<span class="badge b-proceso">${a.proceso}</span>` : ''}
+        ${a.ldap    ? `<span class="badge b-ldap">${a.ldap}</span>` : ''}
+        ${npsB}
+        ${a.date_id ? `<span class="card-meta">${a.date_id}</span>` : ''}
       </div>
-      <div class="card-actions" onclick="event.stopPropagation()">
-        <button class="btn-edit" onclick="openModal('${rep}', '${a.id}')">✏️ Editar</button>
-        <button class="btn-delete" onclick="deleteAnalysis('${rep}', '${a.id}')">🗑 Eliminar</button>
+      <div style="display:flex;align-items:center;gap:8px" onclick="event.stopPropagation()">
+        <div class="card-actions">
+          <button class="btn-sm btn-preview" onclick="openPreview('${rep}','${a.id}')">👁 Vista previa</button>
+          <button class="btn-sm btn-edit2"   onclick="openModal('${rep}','${a.id}')">✏️ Editar</button>
+          <button class="btn-sm btn-del"     onclick="deleteAnalysis('${rep}','${a.id}')">🗑</button>
+        </div>
+        <span class="chevron" id="chev_${a.id}">▼</span>
       </div>
     </div>
-    <div class="card-expand" id="expand_${a.id}">
+    <div class="card-expand" id="exp_${a.id}">
       <div class="card-expand-inner">
-        ${fieldView('Comentario', a.comentario, true)}
-        ${fieldView('Solución', a.solucion, true)}
-        ${fieldView('Conexión emocional / personalización', a.conexion, true)}
-        ${fieldView('Respondimos todas las consultas', a.consultas, true)}
-        ${fieldView('Podríamos haber aplicado excepción', a.excepcion, false)}
-        ${fieldView('¿Qué excepción?', a.que_excepcion, false)}
-        ${fieldView('Error operacional', a.error_op, false)}
-        ${fieldView('Usamos el FA', a.fa, false)}
-        ${fieldView('Análisis Propio', a.analisis_propio, true)}
-        ${fieldView('Análisis del TL', a.analisis_tl, true)}
+        ${fv('Comentario',       a.comentario,        true)}
+        ${fv('Solución',         a.solucion,          true)}
+        ${fvYN('Conexión emocional',  a.conexion,     false)}
+        ${fv('Detalle conexión',      a.conexion_detalle, true)}
+        ${fvYN('Respondimos consultas',a.consultas,   false)}
+        ${fv('Detalle consultas',     a.consultas_detalle, true)}
+        ${fvYN('Excepción / TL',      a.excepcion,   false)}
+        ${fv('¿Qué excepción?',       a.que_excepcion, true)}
+        ${fvYN('Error operacional',   a.error_op,    false)}
+        ${fv('Detalle error op.',     a.error_op_detalle, true)}
+        ${fvYN('Usamos el FA',        a.fa,          false)}
+        ${fv('Detalle FA',            a.fa_detalle,  true)}
+        ${fv('Análisis Propio',       a.analisis_propio, true)}
+        ${fv('Análisis del TL',       a.analisis_tl,     true)}
       </div>
     </div>
   </div>`;
 }
 
-function fieldView(label, value, full) {
-  if (!value) return '';
-  return `<div class="field-view ${full ? 'full' : ''}">
+function fv(label, val, full) {
+  if (!val) return '';
+  return `<div class="field-view ${full?'full':''}">
     <label>${label}</label>
-    <p>${escapeHtml(value)}</p>
+    <div class="fval">${esc(val)}</div>
   </div>`;
 }
-
-function escapeHtml(str) {
-  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+function fvYN(label, val, full) {
+  if (!val) return '';
+  const cls = val === 'si' ? 'yn-yes' : 'yn-no';
+  const txt = val === 'si' ? '✅ Sí' : '❌ No';
+  return `<div class="field-view ${full?'full':''}">
+    <label>${label}</label>
+    <div class="fval ${cls}">${txt}</div>
+  </div>`;
+}
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
 
 function toggleCard(id) {
-  const el = document.getElementById('expand_' + id);
+  const el   = document.getElementById('exp_'  + id);
+  const chev = document.getElementById('chev_' + id);
   el.classList.toggle('open');
+  if (chev) chev.classList.toggle('open');
 }
 
-// ── MODAL ──────────────────────────────────────────────────────────────────
+// ── MODAL ────────────────────────────────────────────────────────────────
 function openModal(rep, id) {
-  currentModalRep = rep;
-  editingId = id;
+  currentRep = rep; editingId = id;
   clearForm();
-
   if (id) {
-    const a = (state.analyses[rep] || []).find(x => x.id === id);
+    const a = (state.analyses[rep]||[]).find(x=>x.id===id);
     if (a) fillForm(a);
     document.getElementById('modalTitle').textContent = '✏️ Editar Análisis';
   } else {
     document.getElementById('modalTitle').textContent = '+ Nuevo Análisis';
-    // Pre-fill LDAP con nombre del rep
-    document.getElementById('f_ldap').value = rep.toLowerCase();
-    // Pre-fill fecha de hoy
     document.getElementById('f_date_id').value = new Date().toISOString().split('T')[0];
   }
-
   document.getElementById('modalOverlay').classList.add('open');
 }
-
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
-  editingId = null;
-  currentModalRep = null;
+  editingId = null; currentRep = null;
 }
 
 function clearForm() {
-  ['f_caso','f_date_id','f_ldap','f_comentario','f_solucion',
-   'f_conexion','f_consultas','f_excepcion','f_que_excepcion',
-   'f_error_op','f_fa','f_analisis_propio','f_analisis_tl'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+  ['f_caso','f_date_id','f_comentario','f_solucion',
+   'f_conexion_detalle','f_consultas_detalle','f_que_excepcion',
+   'f_error_op_detalle','f_fa_detalle','f_analisis_propio','f_analisis_tl'
+  ].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('f_mes').value = '';
+  document.getElementById('f_ldap').value = '';
   document.getElementById('f_proceso').value = '';
   document.getElementById('f_nps').value = '';
-  document.getElementById('nps0').classList.remove('selected');
-  document.getElementById('npsN1').classList.remove('selected');
+  document.getElementById('nps0').classList.remove('sel');
+  document.getElementById('npsN1').classList.remove('sel');
+  ynKeys.forEach(k => {
+    document.getElementById('f_'+k).value = '';
+    document.querySelectorAll(`#yn_${k} .yn-opt`).forEach(el=>el.classList.remove('sel'));
+  });
 }
 
 function fillForm(a) {
-  document.getElementById('f_caso').value        = a.caso || '';
-  document.getElementById('f_date_id').value     = a.date_id || '';
-  document.getElementById('f_ldap').value        = a.ldap || '';
-  document.getElementById('f_mes').value         = a.mes || '';
-  document.getElementById('f_proceso').value     = a.proceso || '';
-  document.getElementById('f_comentario').value  = a.comentario || '';
-  document.getElementById('f_solucion').value    = a.solucion || '';
-  document.getElementById('f_conexion').value    = a.conexion || '';
-  document.getElementById('f_consultas').value   = a.consultas || '';
-  document.getElementById('f_excepcion').value   = a.excepcion || '';
-  document.getElementById('f_que_excepcion').value = a.que_excepcion || '';
-  document.getElementById('f_error_op').value    = a.error_op || '';
-  document.getElementById('f_fa').value          = a.fa || '';
-  document.getElementById('f_analisis_propio').value = a.analisis_propio || '';
-  document.getElementById('f_analisis_tl').value = a.analisis_tl || '';
-  document.getElementById('f_nps').value         = a.nps || '';
-  if (a.nps === '0')  document.getElementById('nps0').classList.add('selected');
-  if (a.nps === '-1') document.getElementById('npsN1').classList.add('selected');
+  const set = (id, v) => { if(document.getElementById(id)) document.getElementById(id).value = v||''; };
+  set('f_caso', a.caso); set('f_date_id', a.date_id); set('f_ldap', a.ldap);
+  set('f_mes', a.mes); set('f_proceso', a.proceso); set('f_comentario', a.comentario);
+  set('f_solucion', a.solucion); set('f_conexion_detalle', a.conexion_detalle);
+  set('f_consultas_detalle', a.consultas_detalle); set('f_que_excepcion', a.que_excepcion);
+  set('f_error_op_detalle', a.error_op_detalle); set('f_fa_detalle', a.fa_detalle);
+  set('f_analisis_propio', a.analisis_propio); set('f_analisis_tl', a.analisis_tl);
+  set('f_nps', a.nps);
+  if (a.nps === '0')  document.getElementById('nps0').classList.add('sel');
+  if (a.nps === '-1') document.getElementById('npsN1').classList.add('sel');
+  ynKeys.forEach(k => {
+    if (a[k]) {
+      set('f_'+k, a[k]);
+      const btn = document.querySelector(`#yn_${k} .yn-opt.${a[k]==='si'?'y':'n'}`);
+      if (btn) btn.classList.add('sel');
+    }
+  });
 }
 
-function selectNPS(val) {
-  document.getElementById('f_nps').value = String(val);
-  document.getElementById('nps0').classList.toggle('selected',   val === 0);
-  document.getElementById('npsN1').classList.toggle('selected', val === -1);
+function selectNPS(v) {
+  document.getElementById('f_nps').value = String(v);
+  document.getElementById('nps0').classList.toggle('sel',   v===0);
+  document.getElementById('npsN1').classList.toggle('sel', v===-1);
 }
 
-// ── SAVE ───────────────────────────────────────────────────────────────────
+function selectYN(key, val) {
+  document.getElementById('f_'+key).value = val;
+  document.querySelectorAll(`#yn_${key} .yn-opt`).forEach(el=>el.classList.remove('sel'));
+  const t = val==='si' ? 'y' : 'n';
+  document.querySelector(`#yn_${key} .yn-opt.${t}`).classList.add('sel');
+}
+
+// ── SAVE ─────────────────────────────────────────────────────────────────
 function saveAnalysis() {
   const caso = document.getElementById('f_caso').value.trim();
-  const ldap = document.getElementById('f_ldap').value.trim();
+  const ldap = document.getElementById('f_ldap').value;
   if (!caso) { showToast('⚠️ El campo CASO es obligatorio.'); return; }
-  if (!ldap) { showToast('⚠️ El campo LDAP es obligatorio.');  return; }
+  if (!ldap) { showToast('⚠️ Seleccioná un LDAP.');          return; }
 
+  const g = id => document.getElementById(id).value.trim();
   const data = {
-    id:             editingId || Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    id:               editingId || (Date.now().toString(36)+Math.random().toString(36).slice(2,5)),
     caso,
-    date_id:        document.getElementById('f_date_id').value,
+    date_id:          g('f_date_id'),
     ldap,
-    mes:            document.getElementById('f_mes').value,
-    proceso:        document.getElementById('f_proceso').value.trim(),
-    comentario:     document.getElementById('f_comentario').value.trim(),
-    nps:            document.getElementById('f_nps').value,
-    solucion:       document.getElementById('f_solucion').value.trim(),
-    conexion:       document.getElementById('f_conexion').value.trim(),
-    consultas:      document.getElementById('f_consultas').value.trim(),
-    excepcion:      document.getElementById('f_excepcion').value.trim(),
-    que_excepcion:  document.getElementById('f_que_excepcion').value.trim(),
-    error_op:       document.getElementById('f_error_op').value.trim(),
-    fa:             document.getElementById('f_fa').value.trim(),
-    analisis_propio: document.getElementById('f_analisis_propio').value.trim(),
-    analisis_tl:    document.getElementById('f_analisis_tl').value.trim(),
-    timestamp:      new Date().toISOString()
+    mes:              document.getElementById('f_mes').value,
+    proceso:          document.getElementById('f_proceso').value,
+    comentario:       g('f_comentario'),
+    nps:              g('f_nps'),
+    solucion:         g('f_solucion'),
+    conexion:         g('f_conexion'),
+    conexion_detalle: g('f_conexion_detalle'),
+    consultas:        g('f_consultas'),
+    consultas_detalle:g('f_consultas_detalle'),
+    excepcion:        g('f_excepcion'),
+    que_excepcion:    g('f_que_excepcion'),
+    error_op:         g('f_error_op'),
+    error_op_detalle: g('f_error_op_detalle'),
+    fa:               g('f_fa'),
+    fa_detalle:       g('f_fa_detalle'),
+    analisis_propio:  g('f_analisis_propio'),
+    analisis_tl:      g('f_analisis_tl'),
+    ts: new Date().toISOString()
   };
 
-  if (!state.analyses[currentModalRep]) state.analyses[currentModalRep] = [];
-
+  if (!state.analyses[currentRep]) state.analyses[currentRep] = [];
   if (editingId) {
-    const idx = state.analyses[currentModalRep].findIndex(x => x.id === editingId);
-    if (idx !== -1) state.analyses[currentModalRep][idx] = data;
-    showToast('✅ Análisis actualizado.');
+    const idx = state.analyses[currentRep].findIndex(x=>x.id===editingId);
+    if (idx!==-1) state.analyses[currentRep][idx] = data;
+    showToast('✅ Análisis actualizado correctamente.');
   } else {
-    state.analyses[currentModalRep].push(data);
+    state.analyses[currentRep].push(data);
     showToast('✅ Análisis cerrado y guardado.');
   }
-
-  saveState();
-  closeModal();
-  renderPanels();
+  saveState(); closeModal(); renderTabs(); renderPanels();
 }
 
-// ── DELETE ─────────────────────────────────────────────────────────────────
+// ── DELETE ───────────────────────────────────────────────────────────────
 function deleteAnalysis(rep, id) {
   if (!confirm('¿Eliminar este análisis? Esta acción no se puede deshacer.')) return;
-  state.analyses[rep] = (state.analyses[rep] || []).filter(x => x.id !== id);
-  saveState();
-  renderPanels();
+  state.analyses[rep] = (state.analyses[rep]||[]).filter(x=>x.id!==id);
+  saveState(); renderTabs(); renderPanels();
   showToast('🗑 Análisis eliminado.');
 }
 
-// ── ADD REP ────────────────────────────────────────────────────────────────
+// ── ADD REP ───────────────────────────────────────────────────────────────
 function addRep() {
   const name = prompt('Nombre del representante:');
-  if (!name || !name.trim()) return;
+  if (!name||!name.trim()) return;
   const rep = name.trim();
   if (state.reps.includes(rep)) { showToast('⚠️ Ya existe ese representante.'); return; }
   state.reps.push(rep);
   state.analyses[rep] = [];
   activeRep = rep;
-  saveState();
-  renderTabs();
-  renderPanels();
+  saveState(); renderTabs(); renderPanels();
   showToast('✅ Representante agregado.');
 }
 
-// ── TOAST ──────────────────────────────────────────────────────────────────
+// ── PREVIEW ───────────────────────────────────────────────────────────────
+const FIELD_LABELS = [
+  ['caso',             'CASO'],
+  ['date_id',          'DATE_ID'],
+  ['ldap',             'LDAP'],
+  ['mes',              'MES'],
+  ['proceso',          'PROCESO'],
+  ['nps',              'NPS'],
+  ['comentario',       'COMENTARIO'],
+  ['solucion',         'Solución'],
+  ['conexion',         'Conexión emocional / personalización'],
+  ['conexion_detalle', 'Detalle conexión emocional'],
+  ['consultas',        'Respondimos todas las consultas'],
+  ['consultas_detalle','Detalle consultas'],
+  ['excepcion',        'Podríamos haber aplicado excepción / TL'],
+  ['que_excepcion',    '¿Qué excepción?'],
+  ['error_op',         'Error operacional'],
+  ['error_op_detalle', 'Detalle error operacional'],
+  ['fa',               'Usamos el FA'],
+  ['fa_detalle',       'Detalle FA'],
+  ['analisis_propio',  'Análisis Propio'],
+  ['analisis_tl',      'Análisis del TL'],
+];
+
+function openPreview(rep, id) {
+  const a = (state.analyses[rep]||[]).find(x=>x.id===id);
+  if (!a) return;
+  previewData = a;
+  document.getElementById('previewTitle').textContent = `👁 Vista Previa — Caso ${a.caso||'—'}`;
+
+  const body = document.getElementById('previewBody');
+  body.innerHTML = FIELD_LABELS.map(([key, label]) => {
+    let val = a[key] || '';
+    if (!val) return '';
+    if (val === 'si') val = 'Sí';
+    if (val === 'no') val = 'No';
+    return `
+      <div class="preview-row">
+        <div class="preview-label">${label}</div>
+        <div class="preview-value" id="pv_${key}">${esc(val)}</div>
+        <button class="btn-copy-field" id="cpbtn_${key}" onclick="copyField('${key}','${val.replace(/'/g,"\\'")}')">📋 Copiar</button>
+      </div>`;
+  }).join('');
+
+  document.getElementById('previewOverlay').classList.add('open');
+}
+
+function closePreview() {
+  document.getElementById('previewOverlay').classList.remove('open');
+  previewData = null;
+}
+
+function copyField(key, val) {
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById('cpbtn_' + key);
+    if (btn) { btn.textContent = '✅ Copiado'; btn.classList.add('copied'); }
+    showToast('📋 Copiado al portapapeles.');
+    setTimeout(() => { if(btn){btn.textContent='📋 Copiar'; btn.classList.remove('copied');} }, 2000);
+  });
+}
+
+function copyAll() {
+  if (!previewData) return;
+  const lines = FIELD_LABELS
+    .map(([key, label]) => {
+      let v = previewData[key] || '';
+      if (!v) return null;
+      if (v==='si') v='Sí';
+      if (v==='no') v='No';
+      return `${label}\t${v}`;
+    })
+    .filter(Boolean)
+    .join('\n');
+  navigator.clipboard.writeText(lines).then(() => {
+    showToast('📋 Todo copiado — ¡Pegalo en Excel con Ctrl+V!');
+  });
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── INIT ───────────────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────────────
 renderTabs();
 renderPanels();
 </script>
